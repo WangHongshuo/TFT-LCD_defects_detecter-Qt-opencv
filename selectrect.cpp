@@ -6,16 +6,26 @@ SelectRect::SelectRect(QWidget *parent) : QWidget(parent)
 {
     image = new QImage;
     is_image_load = false;
+
+    // 初始化右键菜单
+    subMenu = new QMenu();
+    subActionReset = subMenu->addAction(tr("重选"));
+    subActionSave = subMenu->addAction(tr("另存为"));
+    subActionExit = subMenu->addAction(tr("退出"));
+    connect(subActionExit,SIGNAL(triggered()),this,SLOT(select_exit()));
+    connect(subActionSave,SIGNAL(triggered()),this,SLOT(cut_img()));
+    connect(subActionReset,SIGNAL(triggered()),this,SLOT(select_reset()));
     // 关闭后释放资源
     this->setAttribute(Qt::WA_DeleteOnClose);
 }
 
 SelectRect::~SelectRect()
 {
-    if(is_image_load)
-        delete image;
+    disconnect(this->parent(),SIGNAL(parent_widget_size_changed(int,int)),this,SLOT(receive_parent_size_changed_value(int,int)));
+    disconnect(this,SIGNAL(select_mode_exit()),this->parent(),SLOT(is_select_mode_exit()));
+    delete image;
+    delete subMenu;
 }
-
 
 void SelectRect::paintEvent(QPaintEvent *event)
 {
@@ -83,16 +93,7 @@ void SelectRect::mouseMoveEvent(QMouseEvent *event)
 
 void SelectRect::contextMenuEvent(QContextMenuEvent *event)
 {
-    QCursor cur=this->cursor();
-    subMenu = new QMenu();
-    subActionReset = subMenu->addAction(tr("重选"));
-    subActionSave = subMenu->addAction(tr("另存为"));
-    subActionExit = subMenu->addAction(tr("退出"));
-    connect(subActionExit,SIGNAL(triggered()),this,SLOT(select_exit()));
-    connect(subActionSave,SIGNAL(triggered()),this,SLOT(cut_img()));
-    connect(subActionReset,SIGNAL(triggered()),this,SLOT(select_reset()));
-    subMenu->exec(cur.pos());
-    delete subMenu;
+    subMenu->exec(QCursor::pos());
 }
 
 void SelectRect::select_exit()
@@ -169,7 +170,7 @@ void SelectRect::cut_img()
             if(w > 0 && h > 0)
             {
                 *save_img = temp->copy(x,y,w,h);
-                QString filename = QFileDialog::getSaveFileName(this, tr("Open File"),
+                QString filename = QFileDialog::getSaveFileName(this, tr("Save File"),
                                                                 "C:/",
                                                                 tr("Images (*.png *.xpm *.jpg *.tiff *.bmp)"));
                 save_img->save(filename);
@@ -188,4 +189,9 @@ void SelectRect::cut_img()
         QMessageBox msgBox(QMessageBox::Critical,tr("错误"),tr("未选中图像！"));
         msgBox.exec();
     }
+}
+
+void SelectRect::receive_parent_size_changed_value(int width, int height)
+{
+    this->setGeometry(0,0,width,height);
 }

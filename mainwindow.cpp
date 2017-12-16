@@ -5,6 +5,9 @@
 #include <QTextCodec>
 #include <QMessageBox>
 #include <QDebug>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -46,7 +49,7 @@ void MainWindow::on_open_file_clicked()
                                                     tr("Image File(*.bmp *.jpg *.jpeg *.png)"));
     QTextCodec *code = QTextCodec::codecForName("gb18030");
     std::string name = code->fromUnicode(filename).data();
-    M_input_img = cv::imread(name,IMREAD_GRAYSCALE);
+    M_input_img = imread(name,IMREAD_GRAYSCALE);
     //    qDebug() << M_input_img.channels();
     if(!M_input_img.data)
     {
@@ -93,16 +96,16 @@ void MainWindow::update()
         bw_t_value = ui->bw_t->value();
 
         defect.set_parameters(M_input_img,avg_filter_window_size,R_value,r1_value,r2_value,bw_t_value);
-        Q_input_img = Mat2QImage(M_input_img);
-        ui->show_input_img->setImage(&Q_input_img,false);
-        Q_DFT_img = Mat2QImage((*defect.DFT_img));
-        ui->show_DFT_img->setImage(&Q_DFT_img,false);
-        Q_p_DFT_img = Mat2QImage((*defect.p_DFT_img));
-        ui->show_p_DFT_img->setImage(&Q_p_DFT_img,false);
-        Q_output_img = Mat2QImage((*defect.p_img));
-        ui->show_p_img->setImage(&Q_output_img,false);
-        Q_bw_img = Mat2QImage((*defect.bw_img));
-        ui->show_bw_img->setImage(&Q_bw_img,false);
+        Q_input_img = Mat2QImage_with_pointer(M_input_img);
+        ui->show_input_img->set_image_with_pointer(&Q_input_img,true,true);
+        Q_DFT_img = Mat2QImage_with_pointer((*defect.DFT_img));
+        ui->show_DFT_img->set_image_with_pointer(&Q_DFT_img,true,true);
+        Q_p_DFT_img = Mat2QImage_with_pointer((*defect.p_DFT_img));
+        ui->show_p_DFT_img->set_image_with_pointer(&Q_p_DFT_img,true,true);
+        Q_output_img = Mat2QImage_with_pointer((*defect.p_img));
+        ui->show_p_img->set_image_with_pointer(&Q_output_img,true,true);
+        Q_bw_img = Mat2QImage_with_pointer((*defect.bw_img));
+        ui->show_bw_img->set_image_with_pointer(&Q_bw_img,true,true);
         ui->p_time->setText(QString::number(a.elapsed())+" Ms");
     }
 }

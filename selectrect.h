@@ -34,10 +34,7 @@ public:
         is_image_load = true;
     }
 
-    void paintEvent(QPaintEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void contextMenuEvent(QContextMenuEvent *event);
+
     double scalex;
     double scaley;
     int xtranslate;
@@ -49,12 +46,21 @@ protected:
 signals:
     void select_mode_exit();
 public slots:
+
+
+private slots:
+    void receive_parent_size_changed_value(int width, int height);
     void select_exit();
     void select_reset();
     void cut_img();
 
+
 private:
 
+    void paintEvent(QPaintEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void contextMenuEvent(QContextMenuEvent *event);
 
     QMenu* subMenu;
     QAction* subActionReset;
