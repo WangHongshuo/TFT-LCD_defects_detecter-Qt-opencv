@@ -4,4 +4,4 @@
 
 can't upload due to some issues.
 
-文章没法暂时不上传了
+暂时无法公开。

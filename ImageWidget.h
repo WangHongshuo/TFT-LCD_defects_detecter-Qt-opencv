@@ -21,13 +21,16 @@ public:
 	ImageWidget(QWidget *parent);
 	~ImageWidget();
 
-    void setImage(QImage* img)
+    void setImage(QImage* img, bool is_default = true)
 	{
         mp_img = img;
         is_image_load = true;
-        scalex = scaley = 1.0;
-        xtranslate = ytranslate = 0;
-        last_x_pos = last_y_pos = 0;
+        if(is_default)
+        {
+            scalex = scaley = 1.0;
+            xtranslate = ytranslate = 0;
+            last_x_pos = last_y_pos = 0;
+        }
         mouse = No;
 		update();
 	}

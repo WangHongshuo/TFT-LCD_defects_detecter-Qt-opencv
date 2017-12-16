@@ -5,15 +5,33 @@
 #include <QTextCodec>
 #include <QMessageBox>
 #include <QDebug>
-#include <QTime>
 
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    setFixedSize(820,602);
     ui->setupUi(this);
+
+    ui->avg_filter_window->setValue(11);
+    ui->avg_filter_window->setSingleStep(2);
+    ui->avg_filter_window->setMinimum(1);
+
+    ui->R->setValue(2);
+    ui->R->setMinimum(0);
+
+    ui->r1->setValue(1);
+    ui->r1->setMinimum(-1);
+
+    ui->r2->setValue(5);
+    ui->r2->setMinimum(-1);
+
+    ui->bw_t->setValue(10);
+    ui->bw_t->setMinimum(0);
+
+    ui->update_date->setEnabled(false);
+    ui->auto_update->setEnabled(false);
+    ui->auto_update->setChecked(false);
 }
 
 MainWindow::~MainWindow()
@@ -29,28 +47,87 @@ void MainWindow::on_open_file_clicked()
     QTextCodec *code = QTextCodec::codecForName("gb18030");
     std::string name = code->fromUnicode(filename).data();
     M_input_img = cv::imread(name,IMREAD_GRAYSCALE);
-//    qDebug() << M_input_img.channels();
+    //    qDebug() << M_input_img.channels();
     if(!M_input_img.data)
     {
+        ui->update_date->setEnabled(false);
+        ui->auto_update->setEnabled(false);
+        ui->auto_update->setChecked(false);
+        is_img_load = false;
         QMessageBox msgBox;
         msgBox.setText(tr("Image data is null!"));
         msgBox.exec();
     }
     else
     {
-        QTime a;
+        int temp;
+        if(M_input_img.cols < M_input_img.rows)
+            temp = M_input_img.cols;
+        else
+            temp = M_input_img.rows;
+        if(temp % 2 == 0)
+            temp -= 1;
+        ui->avg_filter_window->setMaximum(temp);
+        ui->update_date->setEnabled(true);
+        ui->auto_update->setEnabled(true);
+        is_img_load = true;
+        update();
+    }
+}
+
+void MainWindow::update()
+{
+    if(is_img_load)
+    {
         a.start();
-        defect.set_img(M_input_img);
+
+        avg_filter_window_size = ui->avg_filter_window->value();
+        if(avg_filter_window_size % 2 == 0)
+        {
+            avg_filter_window_size -= 1;
+            ui->avg_filter_window->setValue(avg_filter_window_size);
+        }
+        R_value = ui->R->value();
+        r1_value = ui->r1->value();
+        r2_value = ui->r2->value();
+        bw_t_value = ui->bw_t->value();
+
+        defect.set_parameters(M_input_img,avg_filter_window_size,R_value,r1_value,r2_value,bw_t_value);
         Q_input_img = Mat2QImage(M_input_img);
-        ui->show_input_img->setImage(&Q_input_img);
+        ui->show_input_img->setImage(&Q_input_img,false);
         Q_DFT_img = Mat2QImage((*defect.DFT_img));
-        ui->show_DFT_img->setImage(&Q_DFT_img);
+        ui->show_DFT_img->setImage(&Q_DFT_img,false);
         Q_p_DFT_img = Mat2QImage((*defect.p_DFT_img));
-        ui->show_p_DFT_img->setImage(&Q_p_DFT_img);
+        ui->show_p_DFT_img->setImage(&Q_p_DFT_img,false);
         Q_output_img = Mat2QImage((*defect.p_img));
-        ui->show_p_img->setImage(&Q_output_img);
+        ui->show_p_img->setImage(&Q_output_img,false);
         Q_bw_img = Mat2QImage((*defect.bw_img));
-        ui->show_bw_img->setImage(&Q_bw_img);
+        ui->show_bw_img->setImage(&Q_bw_img,false);
         ui->p_time->setText(QString::number(a.elapsed())+" Ms");
+    }
+}
+
+void MainWindow::on_update_date_clicked()
+{
+    update();
+}
+
+void MainWindow::on_auto_update_clicked(bool checked)
+{
+    if(checked)
+    {
+        connect(ui->avg_filter_window,SIGNAL(valueChanged(int)),this,SLOT(update()));
+        connect(ui->R,SIGNAL(valueChanged(int)),this,SLOT(update()));
+        connect(ui->r1,SIGNAL(valueChanged(int)),this,SLOT(update()));
+        connect(ui->r2,SIGNAL(valueChanged(int)),this,SLOT(update()));
+        connect(ui->bw_t,SIGNAL(valueChanged(int)),this,SLOT(update()));
+    }
+    else
+    {
+        disconnect(ui->avg_filter_window,SIGNAL(valueChanged(int)),this,SLOT(update()));
+        disconnect(ui->R,SIGNAL(valueChanged(int)),this,SLOT(update()));
+        disconnect(ui->r1,SIGNAL(valueChanged(int)),this,SLOT(update()));
+        disconnect(ui->r2,SIGNAL(valueChanged(int)),this,SLOT(update()));
+        disconnect(ui->bw_t,SIGNAL(valueChanged(int)),this,SLOT(update()));
     }
 }

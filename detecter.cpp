@@ -23,19 +23,27 @@ Detecter::~Detecter()
 //    qDebug() << "delete done!";
 }
 
-void Detecter::set_img(const Mat &data)
+void Detecter::set_parameters(const Mat &data, int filter_size, int R, int r1, int r2, int bw_t)
 {
     *ori_img = data.clone();
-    img_width = data.cols;
-    img_height = data.rows;
-    main_task();
+    set_parameters_con(filter_size, R, r1, r2, bw_t);
 }
 
-void Detecter::set_img(const Mat* data)
+void Detecter::set_parameters(const Mat* data, int filter_size, int R, int r1, int r2, int bw_t)
 {
     *ori_img = data->clone();
-    img_width = data->cols;
-    img_height = data->rows;
+    set_parameters_con(filter_size, R, r1, r2, bw_t);
+}
+
+void Detecter::set_parameters_con(int filter_size, int R, int r1, int r2, int bw_t)
+{
+    img_width = ori_img->cols;
+    img_height = ori_img->rows;
+    avg_filter_window_size = filter_size;
+    R_value = R;
+    r1_value = r1;
+    r2_value = r2;
+    bw_t_value = bw_t;
     main_task();
 }
 
@@ -52,11 +60,10 @@ void Detecter::main_task()
     mask.convertTo(mask,CV_32F);
     multiply(mask,Am,Am);
     IDFT_function(*p_img,Am,Cosine,Sine);
-    bw_t = get_bw_value(*p_img,10);
+    bw_t = get_bw_value(*p_img,bw_t_value);
     threshold(*p_img,*bw_img,bw_t,255,CV_THRESH_BINARY);
     bwareaopen(*bw_img,4);
     *bw_img = (*bw_img) < 100;
-
 }
 
 Mat Detecter::create_complex_Mat(Mat &data)
@@ -187,12 +194,13 @@ void Detecter::ishift(Mat &data)
 
 Mat Detecter::get_sailencyMap(Mat &data)
 {
+
 //    qDebug() << data.ptr<uchar>(0)[0] << data.ptr<uchar>(0)[1] << data.ptr<uchar>(1)[0] << data.ptr<uchar>(1)[1];
     Mat complex = create_complex_Mat(data);
     Mat A, C, S;
     DFT_function(complex,A,C,S);
     Mat A_avg;
-    blur(A,A_avg,Size(11,11),Point(-1,-1),BORDER_REPLICATE);
+    blur(A,A_avg,Size(avg_filter_window_size,avg_filter_window_size),Point(-1,-1),BORDER_REPLICATE);
 //    qDebug() << A_avg.ptr<float>(0)[0];
     A = A - A_avg;
 //    for(int i=0;i<4;i++)
@@ -204,9 +212,11 @@ Mat Detecter::get_sailencyMap(Mat &data)
     threshold(A,A,0,1,CV_THRESH_OTSU);
     bwareaopen(A,4);
     Mat kern = getStructuringElement(MORPH_CROSS, Size(3, 3));
-    dilate(A, A, kern, Point(-1, -1), 2);
-    circle(A,cv::Point((img_width/2),(img_height/2)),5,0,-1);
-    circle(A,cv::Point((img_width/2),(img_height/2)),0,1,-1);
+    dilate(A, A, kern, Point(-1, -1), R_value);
+    if(r2_value >= 0)
+        circle(A,cv::Point((img_width/2),(img_height/2)),r2_value,0,-1);
+    if(r1_value >= 0)
+        circle(A,cv::Point((img_width/2),(img_height/2)),r1_value,1,-1);
     return A;
 }
 

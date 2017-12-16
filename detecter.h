@@ -10,9 +10,8 @@ class Detecter
 public:
     Detecter();
     ~Detecter();
-    void set_img(const Mat &data);
-    void set_img(const Mat* data);
-
+    void set_parameters(const Mat &data, int filter_size, int R, int r1, int r2, int bw_t);
+    void set_parameters(const Mat* data, int filter_size, int R, int r1, int r2, int bw_t);
     Mat* ori_img;
     Mat* DFT_img;
     Mat* p_DFT_img;
@@ -33,12 +32,20 @@ private:
     Mat get_sailencyMap(Mat &data);
     void bwareaopen(Mat &data, int n);
     double get_bw_value(const Mat &input, double t);
+    void set_parameters_con(int filter_size, int R, int r1, int r2, int bw_t);
+
     Mat complex_Mat;
 
     Mat Am;
     Mat Cosine;
     Mat Sine;
     double bw_t;
+
+    int avg_filter_window_size;
+    int R_value;
+    int r1_value;
+    int r2_value;
+    int bw_t_value;
 
 };
 

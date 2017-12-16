@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QImage>
+#include <QTime>
 #include "ImageWidget.h"
 #include "mat_qimage_convert.h"
 #include <opencv2/core.hpp>
@@ -26,9 +27,15 @@ public:
 private slots:
     void on_open_file_clicked();
 
-private:
-    Ui::MainWindow *ui;
+    void on_update_date_clicked();
 
+    void on_auto_update_clicked(bool checked);
+
+    void update();
+
+private:
+
+    Ui::MainWindow *ui;
     Mat M_input_img;
     QImage Q_input_img;
     QImage Q_DFT_img;
@@ -36,6 +43,15 @@ private:
     QImage Q_output_img;
     QImage Q_bw_img;
     Detecter defect;
+
+    int avg_filter_window_size;
+    int R_value;
+    int r1_value;
+    int r2_value;
+    int bw_t_value;
+
+    QTime a;
+    bool is_img_load;
 
 };
 
