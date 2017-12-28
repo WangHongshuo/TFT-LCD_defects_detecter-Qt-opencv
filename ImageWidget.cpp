@@ -234,10 +234,11 @@ void ImageWidget::save()
 {
     if(is_image_load)
     {
+        QImage temp = mp_img->copy();
         QString filename = QFileDialog::getSaveFileName(this, tr("Open File"),
                                                         "C:/",
                                                         tr("Images (*.png *.xpm *.jpg *.tiff *.bmp)"));
-        mp_img->save(filename);
+         temp.save(filename);
     }
 }
 
