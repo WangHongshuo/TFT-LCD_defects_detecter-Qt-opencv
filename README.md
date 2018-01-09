@@ -7,11 +7,18 @@ This project started in 2017.11.16 and finished in 2017.12.11. I translated Matl
 ## Screenshots:  ##
 ![img](https://github.com/WangHongshuo/TFT-LCD_defects_detecter-Qt-opencv/blob/master/README/Demo.gif)    
 ## Change Log: ##
+
+- 2018.01.09:
+
+Set `ImageWidget` to submodule.
+
+将 `ImageWidget` 设置为子模块。     
+
 - 2017.12.16 #2：
 
-Updated ImageWidget, selectrect and Mat_QImage_convert synchronously.       
+Updated `ImageWidget`, `selectrect` and `Mat_QImage_convert` synchronously.       
 
-同步更新了ImageWidget, selectrect和Mat_QImage_convert.       
+同步更新了`ImageWidget`, `selectrect`和`Mat_QImage_convert`.       
 
 - 2017.12.16 #1：    
 

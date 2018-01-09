@@ -1,0 +1,6 @@
+[submodule "ImageWidget-Qt"]
+	path = ImageWidget-Qt
+url=https://github.com/WangHongshuo/ImageWidget-Qt
+[submodule "QImageMatConvert"]
+	path = QImageMatConvert
+url=https://github.com/WangHongshuo/QImageMatConvert

@@ -4,8 +4,8 @@
 #include <QMainWindow>
 #include <QImage>
 #include <QTime>
-#include "ImageWidget.h"
-#include "mat_qimage_convert.h"
+#include "ImageWidget-Qt/ImageWidget.h"
+#include "QImageMatConvert/mat_qimage_convert.h"
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include "detecter.h"
