@@ -97,15 +97,15 @@ void MainWindow::update()
 
         defect.set_parameters(M_input_img,avg_filter_window_size,R_value,r1_value,r2_value,bw_t_value);
         Q_input_img = Mat2QImage_with_pointer(M_input_img);
-        ui->show_input_img->set_image_with_pointer(&Q_input_img,true);
+        ui->show_input_img->setImageWithPointer(&Q_input_img,true);
         Q_DFT_img = Mat2QImage_with_pointer((*defect.DFT_img));
-        ui->show_DFT_img->set_image_with_pointer(&Q_DFT_img,true);
+        ui->show_DFT_img->setImageWithPointer(&Q_DFT_img,true);
         Q_p_DFT_img = Mat2QImage_with_pointer((*defect.p_DFT_img));
-        ui->show_p_DFT_img->set_image_with_pointer(&Q_p_DFT_img,true);
+        ui->show_p_DFT_img->setImageWithPointer(&Q_p_DFT_img,true);
         Q_output_img = Mat2QImage_with_pointer((*defect.p_img));
-        ui->show_p_img->set_image_with_pointer(&Q_output_img,true);
+        ui->show_p_img->setImageWithPointer(&Q_output_img,true);
         Q_bw_img = Mat2QImage_with_pointer((*defect.bw_img));
-        ui->show_bw_img->set_image_with_pointer(&Q_bw_img,true);
+        ui->show_bw_img->setImageWithPointer(&Q_bw_img,true);
         ui->p_time->setText(QString::number(a.elapsed())+" Ms");
     }
 }
