@@ -20,7 +20,6 @@ Detecter::~Detecter()
     delete p_DFT_img;
     delete p_img;
     delete bw_img;
-//    qDebug() << "delete done!";
 }
 
 void Detecter::set_parameters(const Mat &data, int filter_size, int R, int r1, int r2, int bw_t)
@@ -56,7 +55,6 @@ void Detecter::main_task()
     mask = 1 - mask;
     multiply(*DFT_img,mask,*p_DFT_img);
     ishift(mask);
-//    qDebug() << Am.type();
     mask.convertTo(mask,CV_32F);
     multiply(mask,Am,Am);
     IDFT_function(*p_img,Am,Cosine,Sine);
@@ -70,20 +68,11 @@ Mat Detecter::create_complex_Mat(Mat &data)
 {
     Mat output;
     Mat r = data.clone();
-//    for(int i=0;i<2;i++)
-//        qDebug() << r.ptr<uchar>(0)[i];
-//    for(int i=0;i<2;i++)
-//        qDebug() << r.ptr<uchar>(1)[i];
     Mat i = Mat::zeros(r.size(),CV_32F);
     if(r.type() != 5)
         r.convertTo(r,CV_32F);
-//    qDebug() << r.channels() << r.isContinuous();
     Mat temp[] = {r,i};
     merge(temp,2,output);
-//    qDebug() << output.isContinuous();
-//    qDebug() << output.channels();
-//    for(int i=0;i<6;i++)
-//        qDebug() << output.ptr<float>(0)[i];
     return output;
 }
 
@@ -98,15 +87,12 @@ Mat Detecter::create_complex_Mat(Mat &R, Mat &I)
     Mat output;
     Mat temp[] = {r, i};
     merge(temp,2,output);
-//    for (int i=0;i<4;i++)
-//        qDebug() << output.ptr<float>(0)[i];
     return output;
 }
 
 void Detecter::DFT_function(Mat &data, Mat &Am, Mat &Cosine, Mat &Sine)
 {
     dft(data,data);
-//    qDebug() << data.type() << data.ptr<float>(0)[0] << data.ptr<float>(0)[1];
     Mat temp[2];
     split(data,temp);
     Mat R = temp[0].clone();
@@ -116,11 +102,6 @@ void Detecter::DFT_function(Mat &data, Mat &Am, Mat &Cosine, Mat &Sine)
     divide(I, Am, Sine);
     Am += 1;
     log(Am,Am);
-//    for(int i=0;i<3;i++)
-//    {
-//        qDebug() << R.ptr<float>(0)[i];
-//        qDebug() << I.ptr<float>(0)[i];
-//    }
 }
 
 void Detecter::IDFT_function(Mat &output, Mat Am, Mat Cosine, Mat Sine)
@@ -144,13 +125,9 @@ void Detecter::IDFT_function(Mat &output, Mat Am, Mat Cosine, Mat Sine)
 Mat Detecter::get_energyMap(Mat Am)
 {
     Mat output = Am.clone();
-//    qDebug() << output.ptr<float>(0)[0];
     shift(output);
-//    qDebug() << output.ptr<float>(0)[0] << output.ptr<float>(0)[1] << output.ptr<float>(0)[2];
     normalize(output,output,0,255,NORM_MINMAX);
-//    qDebug() << output.ptr<float>(0)[0] << output.ptr<float>(0)[1] << output.ptr<float>(0)[2];
     output.convertTo(output,CV_8UC1);
-//    qDebug() << output.ptr<uchar>(0)[0];
     return output;
 }
 
@@ -194,21 +171,13 @@ void Detecter::ishift(Mat &data)
 
 Mat Detecter::get_sailencyMap(Mat &data)
 {
-
-//    qDebug() << data.ptr<uchar>(0)[0] << data.ptr<uchar>(0)[1] << data.ptr<uchar>(1)[0] << data.ptr<uchar>(1)[1];
     Mat complex = create_complex_Mat(data);
     Mat A, C, S;
     DFT_function(complex,A,C,S);
     Mat A_avg;
     blur(A,A_avg,Size(avg_filter_window_size,avg_filter_window_size),Point(-1,-1),BORDER_REPLICATE);
-//    qDebug() << A_avg.ptr<float>(0)[0];
     A = A - A_avg;
-//    for(int i=0;i<4;i++)
-//        qDebug() << A.ptr<float>(0)[i];
     IDFT_function(A,A,C,S);
-//    qDebug() << A.channels() << A.type();
-//    for(int i=0;i<4;i++)
-//        qDebug() << A.ptr<float>(0)[i];
     threshold(A,A,0,1,CV_THRESH_OTSU);
     bwareaopen(A,4);
     Mat kern = getStructuringElement(MORPH_CROSS, Size(3, 3));
@@ -257,18 +226,13 @@ double Detecter::get_bw_value(const Mat &input,double t)
     const float* ranges[] = { my_ranges };
     cv::MatND hist;
     calcHist(&input, 1, channels, cv::Mat(), hist, 1, histSize, ranges);
-//    qDebug() << hist.channels() << hist.rows << hist.cols;
-//    qDebug() << hist.ptr<float>(0)[0];
     Mat mean_value, std_value;
     int i;
     for(i=0;i<256;i++)
     {
         meanStdDev(hist.rowRange(i,255),mean_value,std_value);
-//        qDebug() << var_value.type();
-//        qDebug() << double(var_value.ptr<float>(0)[0]);
         if(std_value.ptr<double>(0)[0] < t)
             break;
     }
-//    qDebug() << i;
     return double(i);
 }

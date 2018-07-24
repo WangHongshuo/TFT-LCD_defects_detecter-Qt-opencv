@@ -43,17 +43,17 @@ FORMS += \
 
 # MinGW32
 
-INCLUDEPATH += D:/opencv3.4.1/opencv_use/include
+INCLUDEPATH += D:/opencv3.4.2/opencv_qt530/include
 
-LIBS += D:/opencv3.4.1/opencv_use/lib/libopencv_*.a
+LIBS += D:/opencv3.4.2/opencv_qt530/lib/libopencv_*.a
 
 # MSVC
 
-#INCLUDEPATH += D:/opencv3.4.1/opencv/build/include
+#INCLUDEPATH += D:/opencv3.4.2/opencv/build/include
 
 #CONFIG(debug, debug|release) {
-#LIBS += D:/opencv3.4.1/opencv/build/x86/vc14/lib/*341d.lib
+#LIBS += D:/opencv3.4.2/opencv/build/x86/vc15/lib/*342d.lib
 #} else {
-#LIBS += D:/opencv3.4.1/opencv/build/x86/vc14/lib/*341.lib
+#LIBS += D:/opencv3.4.2/opencv/build/x86/vc15/lib/*342.lib
 #}
 

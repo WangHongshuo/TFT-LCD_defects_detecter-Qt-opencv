@@ -47,12 +47,11 @@ MainWindow::~MainWindow()
 void MainWindow::on_open_file_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this,tr("Open Image"),
-                                                    "F:/",
+                                                    "",
                                                     tr("Image File(*.bmp *.jpg *.jpeg *.png)"));
     QTextCodec *code = QTextCodec::codecForName("gb18030");
     std::string name = code->fromUnicode(filename).data();
     M_input_img = imread(name,IMREAD_GRAYSCALE);
-    //    qDebug() << M_input_img.channels();
     if(!M_input_img.data)
     {
         ui->update_date->setEnabled(false);
@@ -126,6 +125,7 @@ void MainWindow::on_auto_update_clicked(bool checked)
         connect(ui->r1,SIGNAL(valueChanged(int)),this,SLOT(update()));
         connect(ui->r2,SIGNAL(valueChanged(int)),this,SLOT(update()));
         connect(ui->bw_t,SIGNAL(valueChanged(int)),this,SLOT(update()));
+        update();
     }
     else
     {
