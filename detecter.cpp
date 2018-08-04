@@ -122,7 +122,7 @@ void Detecter::IDFT_function(Mat &output, Mat Am, Mat Cosine, Mat Sine)
     output.convertTo(output,CV_8UC1);
 }
 
-Mat Detecter::get_energyMap(Mat Am)
+Mat Detecter::get_energyMap(Mat &Am)
 {
     Mat output = Am.clone();
     shift(output);

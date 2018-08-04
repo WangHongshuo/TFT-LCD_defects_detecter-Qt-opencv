@@ -644,7 +644,7 @@
                </font>
               </property>
               <property name="text">
-               <string>r1(中心保护半径大小)：</string>
+               <string>r1(中心去除半径大小)：</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -687,7 +687,7 @@
                </font>
               </property>
               <property name="text">
-               <string>r2(中心去除半径大小)：</string>
+               <string>r2(中心保护半径大小)：</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

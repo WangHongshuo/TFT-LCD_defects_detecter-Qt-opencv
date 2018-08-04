@@ -56,8 +56,12 @@ void MainWindow::on_open_file_clicked()
     {
         ui->update_date->setEnabled(false);
         ui->auto_update->setEnabled(false);
-        ui->auto_update->setChecked(false);
         is_img_load = false;
+        ui->show_input_img->clear();
+        ui->show_DFT_img->clear();
+        ui->show_p_DFT_img->clear();
+        ui->show_p_img->clear();
+        ui->show_bw_img->clear();
         QMessageBox msgBox;
         msgBox.setText(tr("Image data is null!"));
         msgBox.exec();
