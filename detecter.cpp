@@ -69,9 +69,9 @@ Mat Detecter::create_complex_Mat(Mat &data)
     Mat output;
     Mat r = data.clone();
     Mat i = Mat::zeros(r.size(),CV_32F);
-    if(r.type() != 5)
+    if(r.type() != CV_32F)
         r.convertTo(r,CV_32F);
-    Mat temp[] = {r,i};
+    Mat temp[] = {r, i};
     merge(temp,2,output);
     return output;
 }
@@ -80,9 +80,9 @@ Mat Detecter::create_complex_Mat(Mat &R, Mat &I)
 {
     Mat r = R.clone();
     Mat i = I.clone();
-    if(r.type() != 5)
+    if(r.type() != CV_32F)
         r.convertTo(r,CV_32F);
-    if(i.type() != 5)
+    if(i.type() != CV_32F)
         i.convertTo(i,CV_32F);
     Mat output;
     Mat temp[] = {r, i};
@@ -95,8 +95,9 @@ void Detecter::DFT_function(Mat &data, Mat &Am, Mat &Cosine, Mat &Sine)
     dft(data,data);
     Mat temp[2];
     split(data,temp);
-    Mat R = temp[0].clone();
-    Mat I = temp[1].clone();
+    // 浅拷贝
+    Mat R = temp[0];
+    Mat I = temp[1];
     magnitude(R,I,Am);
     divide(R, Am, Cosine);
     divide(I, Am, Sine);
