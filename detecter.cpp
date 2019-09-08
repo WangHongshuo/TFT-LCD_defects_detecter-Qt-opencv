@@ -59,7 +59,7 @@ void Detecter::main_task()
     multiply(mask,Am,Am);
     IDFT_function(*p_img,Am,Cosine,Sine);
     bw_t = get_bw_value(*p_img,bw_t_value);
-    threshold(*p_img,*bw_img,bw_t,255,CV_THRESH_BINARY);
+    threshold(*p_img,*bw_img,bw_t,255,THRESH_BINARY);
     bwareaopen(*bw_img,4);
     *bw_img = (*bw_img) < 100;
 }
@@ -179,7 +179,7 @@ Mat Detecter::get_sailencyMap(Mat &data)
     blur(A,A_avg,Size(avg_filter_window_size,avg_filter_window_size),Point(-1,-1),BORDER_REPLICATE);
     A = A - A_avg;
     IDFT_function(A,A,C,S);
-    threshold(A,A,0,1,CV_THRESH_OTSU);
+    threshold(A,A,0,1,THRESH_OTSU);
     bwareaopen(A,4);
     Mat kern = getStructuringElement(MORPH_CROSS, Size(3, 3));
     dilate(A, A, kern, Point(-1, -1), R_value);
@@ -193,7 +193,7 @@ Mat Detecter::get_sailencyMap(Mat &data)
 void Detecter::bwareaopen(Mat &data, int n)
 {
     Mat labels,stats,centroids;
-    connectedComponentsWithStats(data,labels,stats,centroids,8,CV_16U);
+    connectedComponentsWithStats(data,labels,stats,centroids,8,CV_32s);
     int regions_count = stats.rows - 1;
     int regions_size, regions_x1, regions_y1, regions_x2, regions_y2;
 

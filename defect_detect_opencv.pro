@@ -41,19 +41,19 @@ HEADERS += \
 FORMS += \
         mainwindow.ui
 
-# MinGW32
+## MinGW32
 
-INCLUDEPATH += D:/opencv3.4.3/opencv_qt530/include
+#INCLUDEPATH += D:/opencv4.1.0/opencv_qt730/include
 
-LIBS += D:/opencv3.4.3/opencv_qt530/lib/libopencv_*.a
+#LIBS += D:/opencv4.1.0/opencv_qt730/lib/libopencv_*.a
 
-# MSVC
+ MSVC
 
-#INCLUDEPATH += D:/opencv3.4.3/opencv/build/include
+INCLUDEPATH += D:/opencv4.1.0/opencv/build/include
 
-#CONFIG(debug, debug|release) {
-#LIBS += D:/opencv3.4.3/opencv/build/x86/vc15/lib/*343d.lib
-#} else {
-#LIBS += D:/opencv3.4.3/opencv/build/x86/vc15/lib/*343.lib
-#}
+CONFIG(debug, debug|release) {
+LIBS += D:/opencv4.1.0/opencv/build/x86/vc16/lib/*410d.lib
+} else {
+LIBS += D:/opencv4.1.0/opencv/build/x86/vc16/lib/*410.lib
+}
 
