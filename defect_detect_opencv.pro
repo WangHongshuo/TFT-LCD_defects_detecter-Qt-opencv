@@ -28,32 +28,30 @@ SOURCES += \
         mainwindow.cpp \
     detecter.cpp \
     ImageWidget-Qt/ImageWidget.cpp \
-    ImageWidget-Qt/selectrect.cpp \
     QImageMatConvert/mat_qimage_convert.cpp
 
 HEADERS += \
         mainwindow.h \
     detecter.h \
     ImageWidget-Qt/ImageWidget.h \
-    ImageWidget-Qt/selectrect.h \
     QImageMatConvert/mat_qimage_convert.h
 
 FORMS += \
         mainwindow.ui
 
-## MinGW32
+# MinGW32
 
-#INCLUDEPATH += D:/opencv4.1.0/opencv_qt730/include
+INCLUDEPATH += C:/opencv/mingw730/include
 
-#LIBS += D:/opencv4.1.0/opencv_qt730/lib/libopencv_*.a
+LIBS += C:/opencv/mingw730/lib/libopencv_*.a
 
- MSVC
+# MSVC
 
-INCLUDEPATH += D:/opencv4.1.0/opencv/build/include
+#INCLUDEPATH += C:/opencv/msvc2019/include
 
-CONFIG(debug, debug|release) {
-LIBS += D:/opencv4.1.0/opencv/build/x86/vc16/lib/*410d.lib
-} else {
-LIBS += D:/opencv4.1.0/opencv/build/x86/vc16/lib/*410.lib
-}
+#CONFIG(debug, debug|release) {
+#LIBS += C:/opencv/msvc2019/x64/lib/*410d.lib
+#} else {
+#LIBS += C:/opencv/msvc2019/x64/lib/*410.lib
+#}
 
