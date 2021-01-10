@@ -6,7 +6,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QString>
-#include <QTextCodec>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
@@ -36,12 +35,6 @@ MainWindow::MainWindow(QWidget* parent)
     ui->update_date->setEnabled(false);
     ui->auto_update->setEnabled(false);
     ui->auto_update->setChecked(false);
-
-    ui->show_p_img->setEnableRecordLastParameters(true);
-    ui->show_bw_img->setEnableRecordLastParameters(true);
-    ui->show_DFT_img->setEnableRecordLastParameters(true);
-    ui->show_input_img->setEnableRecordLastParameters(true);
-    ui->show_p_DFT_img->setEnableRecordLastParameters(true);
 }
 
 MainWindow::~MainWindow()
@@ -54,8 +47,7 @@ void MainWindow::on_open_file_clicked()
     QString filename = QFileDialog::getOpenFileName(this, tr("Open Image"),
         "",
         tr("Image File(*.bmp *.jpg *.jpeg *.png)"));
-    QTextCodec* code = QTextCodec::codecForName("gb18030");
-    std::string name = code->fromUnicode(filename).data();
+    std::string name = filename.toStdString();
     M_input_img = imread(name, IMREAD_GRAYSCALE);
     if (!M_input_img.data) {
         ui->update_date->setEnabled(false);
@@ -83,7 +75,7 @@ void MainWindow::on_open_file_clicked()
         is_img_load = true;
         timer.start();
         get_parameters();
-        defect.set_parameters(M_input_img, avg_filter_window_size, R_value, r1_value, r2_value, bw_t_value);
+        defect.setParameters(M_input_img, avg_filter_window_size, R_value, r1_value, r2_value, bw_t_value);
         show_images();
         ui->p_time->setText(QString::number(timer.elapsed()) + " Ms");
     }
@@ -94,7 +86,7 @@ void MainWindow::update()
     if (is_img_load) {
         timer.start();
         get_parameters();
-        defect.set_parameters(avg_filter_window_size, R_value, r1_value, r2_value, bw_t_value);
+        defect.setParameters(avg_filter_window_size, R_value, r1_value, r2_value, bw_t_value);
         show_images();
         ui->p_time->setText(QString::number(timer.elapsed()) + " Ms");
     }
@@ -102,16 +94,16 @@ void MainWindow::update()
 
 void MainWindow::show_images()
 {
-    Q_input_img = Mat2QImage_with_pointer(M_input_img);
-    ui->show_input_img->setImageWithPointer(&Q_input_img);
-    Q_DFT_img = Mat2QImage_with_pointer((*defect.DFT_img));
-    ui->show_DFT_img->setImageWithPointer(&Q_DFT_img);
-    Q_p_DFT_img = Mat2QImage_with_pointer((*defect.p_DFT_img));
-    ui->show_p_DFT_img->setImageWithPointer(&Q_p_DFT_img);
-    Q_output_img = Mat2QImage_with_pointer((*defect.p_img));
-    ui->show_p_img->setImageWithPointer(&Q_output_img);
-    Q_bw_img = Mat2QImage_with_pointer((*defect.bw_img));
-    ui->show_bw_img->setImageWithPointer(&Q_bw_img);
+    Q_input_img = ConvertMatToQImage(M_input_img);
+    ui->show_input_img->setImage(Q_input_img);
+    Q_DFT_img = ConvertMatToQImage(*defect.getFreqDomainImg());
+    ui->show_DFT_img->setImage(Q_DFT_img);
+    Q_p_DFT_img = ConvertMatToQImage(*defect.getLowPowerImg());
+    ui->show_p_DFT_img->setImage(Q_p_DFT_img);
+    Q_output_img = ConvertMatToQImage(*defect.getBinaryImg());
+    ui->show_p_img->setImage(Q_output_img);
+    Q_bw_img = ConvertMatToQImage(*defect.getInvBinaryImg());
+    ui->show_bw_img->setImage(Q_bw_img);
 }
 
 void MainWindow::get_parameters()

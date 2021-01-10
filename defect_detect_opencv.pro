@@ -41,9 +41,9 @@ FORMS += \
 
 # MinGW32
 
-INCLUDEPATH += C:/opencv/mingw730/include
+INCLUDEPATH += D:/opencv/include
 
-LIBS += C:/opencv/mingw730/lib/libopencv_*.a
+LIBS += D:/opencv/x64/mingw/lib/libopencv_*.a
 
 # MSVC
 

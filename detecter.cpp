@@ -6,74 +6,104 @@
 
 Detecter::Detecter()
 {
-    ori_img = new Mat;
-    DFT_img = new Mat;
-    p_DFT_img = new Mat;
-    p_img = new Mat;
-    bw_img = new Mat;
+    spatialDomainImg = new Mat;
+    freqDomainImg = new Mat;
+    lowPowerImg = new Mat;
+    binaryImg = new Mat;
+    invBinaryImg = new Mat;
 }
 
 Detecter::~Detecter()
 {
-    delete ori_img;
-    delete DFT_img;
-    delete p_DFT_img;
-    delete p_img;
-    delete bw_img;
+    delete spatialDomainImg;
+    delete freqDomainImg;
+    delete lowPowerImg;
+    delete binaryImg;
+    delete invBinaryImg;
 }
 
-void Detecter::set_parameters(const Mat& data, int filter_size, int R, int r1, int r2, int bw_t)
+void Detecter::setParameters(const Mat& data, int filter_size, int R, int r1, int r2, int bw_t)
 {
-    *ori_img = data.clone();
+    *spatialDomainImg = data.clone();
     set_parameters_con(filter_size, R, r1, r2, bw_t);
     main_task();
 }
 
-void Detecter::set_parameters(const Mat* data, int filter_size, int R, int r1, int r2, int bw_t)
+void Detecter::setParameters(const Mat* data, int filter_size, int R, int r1, int r2, int bw_t)
 {
-    *ori_img = data->clone();
+    *spatialDomainImg = data->clone();
     set_parameters_con(filter_size, R, r1, r2, bw_t);
     main_task();
 }
 
-void Detecter::set_parameters(int filter_size, int R, int r1, int r2, int bw_t)
+void Detecter::setParameters(int filter_size, int R, int r1, int r2, int bw_t)
 {
     set_parameters_con(filter_size, R, r1, r2, bw_t);
     proc_frequency_domain_img();
 }
 
+const Mat* Detecter::getSpatialDomainImg()
+{
+    return spatialDomainImg;
+}
+
+const Mat* Detecter::getFreqDomainImg()
+{
+    return freqDomainImg;
+}
+
+const Mat* Detecter::getFreqDomainMask()
+{
+    return freqDomainMask;
+}
+
+const Mat* Detecter::getLowPowerImg()
+{
+    return lowPowerImg;
+}
+
+const Mat* Detecter::getBinaryImg()
+{
+    return binaryImg;
+}
+
+const Mat* Detecter::getInvBinaryImg()
+{
+    return invBinaryImg;
+}
+
 void Detecter::set_parameters_con(int filter_size, int R, int r1, int r2, int bw_t)
 {
-    img_width = ori_img->cols;
-    img_height = ori_img->rows;
-    avg_filter_window_size = filter_size;
-    R_value = R;
-    r1_value = r1;
-    r2_value = r2;
+    imgWidth = spatialDomainImg->cols;
+    imgHeight = spatialDomainImg->rows;
+    meanFilterSize = filter_size;
+    RValue = R;
+    r1Value = r1;
+    r2Value = r2;
     bw_t_value = bw_t; 
 }
 
 void Detecter::main_task()
 {
-    complex_Mat = create_complex_Mat(*ori_img);
-    DFT_function(complex_Mat, Am, Cosine, Sine);
-    *DFT_img = get_energyMap(Am);
+    complexMat = create_complex_Mat(*spatialDomainImg);
+    DFT_function(complexMat, amplitude, cosine, sine);
+    *freqDomainImg = get_energyMap(amplitude);
     proc_frequency_domain_img();
 }
 
 void Detecter::proc_frequency_domain_img()
 {
-    Mat mask = get_sailencyMap(*DFT_img);
+    Mat mask = get_sailencyMap(*freqDomainImg);
     mask = 1 - mask;
-    multiply(*DFT_img, mask, *p_DFT_img);
+    multiply(*freqDomainImg, mask, *lowPowerImg);
     ishift(mask);
     mask.convertTo(mask, CV_32F);
-    multiply(mask, Am, mask);
-    IDFT_function(*p_img, mask, Cosine, Sine);
-    bw_t = get_bw_value(*p_img, bw_t_value);
-    threshold(*p_img, *bw_img, bw_t, 255, THRESH_BINARY);
-    bwareaopen(*bw_img, 1);
-    *bw_img = (*bw_img) < 100;
+    multiply(mask, amplitude, mask);
+    IDFT_function(*binaryImg, mask, cosine, sine);
+    binarizeThreshold = get_bw_value(*binaryImg, bw_t_value);
+    threshold(*binaryImg, *invBinaryImg, binarizeThreshold, 255, THRESH_BINARY);
+    bwareaopen(*invBinaryImg, 1);
+    *invBinaryImg = (*invBinaryImg) < 100;
 }
 
 Mat Detecter::create_complex_Mat(Mat& data)
@@ -188,17 +218,17 @@ Mat Detecter::get_sailencyMap(Mat& data)
     Mat A, C, S;
     DFT_function(complex, A, C, S);
     Mat A_avg;
-    blur(A, A_avg, Size(avg_filter_window_size, avg_filter_window_size), Point(-1, -1), BORDER_REPLICATE);
+    blur(A, A_avg, Size(meanFilterSize, meanFilterSize), Point(-1, -1), BORDER_REPLICATE);
     A = A - A_avg;
     IDFT_function(A, A, C, S);
     threshold(A, A, 0, 1, THRESH_OTSU);
     bwareaopen(A, 4);
     Mat kern = getStructuringElement(MORPH_CROSS, Size(3, 3));
-    dilate(A, A, kern, Point(-1, -1), R_value);
-    if (r2_value >= 0)
-        circle(A, cv::Point((img_width / 2), (img_height / 2)), r2_value, 0, -1);
-    if (r1_value >= 0)
-        circle(A, cv::Point((img_width / 2), (img_height / 2)), r1_value, 1, -1);
+    dilate(A, A, kern, Point(-1, -1), RValue);
+    if (r2Value >= 0)
+        circle(A, cv::Point((imgWidth / 2), (imgHeight / 2)), r2Value, 0, -1);
+    if (r1Value >= 0)
+        circle(A, cv::Point((imgWidth / 2), (imgHeight / 2)), r1Value, 1, -1);
     return A;
 }
 

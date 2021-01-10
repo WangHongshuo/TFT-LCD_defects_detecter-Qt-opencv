@@ -24,18 +24,39 @@ public:
      *  @param  bw_t                            二值化阈值参数
      *  @return                                 void
      */
-    void set_parameters(const Mat& data, int filter_size, int R, int r1, int r2, int bw_t);
-    void set_parameters(const Mat* data, int filter_size, int R, int r1, int r2, int bw_t);
-    void set_parameters(int filter_size, int R, int r1, int r2, int bw_t);
-    Mat* ori_img;
-    Mat* DFT_img;
-    Mat* p_DFT_img;
-    Mat* p_img;
-    Mat* bw_img;
-    int img_width;
-    int img_height;
+    void setParameters(const Mat& data, int filter_size, int R, int r1, int r2, int binarizeThreshold);
+    void setParameters(const Mat* data, int filter_size, int R, int r1, int r2, int binarizeThreshold);
+    void setParameters(int filter_size, int R, int r1, int r2, int binarizeThreshold);
+    const Mat* getSpatialDomainImg();
+    const Mat* getFreqDomainImg();
+    const Mat* getFreqDomainMask();
+    const Mat* getLowPowerImg();
+    const Mat* getBinaryImg();
+    const Mat* getInvBinaryImg();
 
 private:
+    Mat* spatialDomainImg;
+    Mat* freqDomainImg;
+    Mat* freqDomainMask;
+    Mat* lowPowerImg;
+    Mat* binaryImg;
+    Mat* invBinaryImg;
+    int imgWidth;
+    int imgHeight;
+
+    Mat complexMat;
+
+    Mat amplitude;
+    Mat cosine;
+    Mat sine;
+    double binarizeThreshold;
+
+    int meanFilterSize;
+    int RValue;
+    int r1Value;
+    int r2Value;
+    int bw_t_value;
+
     /** @fn                                     主逻辑
      *  @return                                 void
      */
@@ -62,7 +83,7 @@ private:
      *  @param  Sine                            欧拉公式中的Sin(theta)
      *  @return                                 void
      */
-    void DFT_function(Mat& data, Mat& Am, Mat& Cosine, Mat& Sine);
+    void DFT_function(Mat& data, Mat& amplitude, Mat& cosine, Mat& sine);
     /** @fn                                     IDFT变换
      *  @param  data                            输出Mat
      *  @param  Am                              振幅Mat
@@ -70,12 +91,12 @@ private:
      *  @param  Sine                            欧拉公式中的Sin(theta)
      *  @return                                 void
      */
-    void IDFT_function(Mat& output, Mat Am, Mat Cosine, Mat Sine);
+    void IDFT_function(Mat& output, Mat amplitude, Mat cosine, Mat sine);
     /** @fn                                     获取能量谱
      *  @param  Am                              振幅谱Mat
      *  @return                                 能量谱Mat
      */
-    Mat get_energyMap(Mat& Am);
+    Mat get_energyMap(Mat& amplitude);
     /** @fn                                     把能量谱的零频点平移到正中心
      *  @param  data                            未平移的能量谱Mat
      *  @return                                 void
@@ -111,20 +132,7 @@ private:
      *  @param  bw_t                            二值化阈值参数
      *  @return                                 void
      */
-    void set_parameters_con(int filter_size, int R, int r1, int r2, int bw_t);
-
-    Mat complex_Mat;
-
-    Mat Am;
-    Mat Cosine;
-    Mat Sine;
-    double bw_t;
-
-    int avg_filter_window_size;
-    int R_value;
-    int r1_value;
-    int r2_value;
-    int bw_t_value;
+    void set_parameters_con(int filter_size, int R, int r1, int r2, int binarizeThreshold);
 };
 
 #endif // DETECTER_H
