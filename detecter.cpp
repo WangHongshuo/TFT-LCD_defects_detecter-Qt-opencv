@@ -80,7 +80,7 @@ void Detecter::set_parameters_con(int filter_size, int R, int r1, int r2, int bw
     RValue = R;
     r1Value = r1;
     r2Value = r2;
-    bw_t_value = bw_t; 
+    bw_t_value = bw_t;
 }
 
 void Detecter::main_task()
@@ -249,7 +249,7 @@ void Detecter::bwareaopen(Mat& data, int n)
 
             for (int j = regions_y1; j < regions_y2; j++) {
                 for (int k = regions_x1; k < regions_x2; k++) {
-                    if (labels.ptr<ushort>(j)[k] == i)
+                    if (labels.ptr<int>(j)[k] == i)
                         data.ptr<uchar>(j)[k] = 0;
                 }
             }
