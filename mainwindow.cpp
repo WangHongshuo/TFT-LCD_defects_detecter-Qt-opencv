@@ -16,25 +16,25 @@ MainWindow::MainWindow(QWidget* parent)
 {
     ui->setupUi(this);
 
-    ui->avg_filter_window->setValue(11);
-    ui->avg_filter_window->setSingleStep(2);
-    ui->avg_filter_window->setMinimum(1);
+    ui->qsbAvgFilterSize->setValue(11);
+    ui->qsbAvgFilterSize->setSingleStep(2);
+    ui->qsbAvgFilterSize->setMinimum(1);
 
-    ui->R->setValue(2);
-    ui->R->setMinimum(0);
+    ui->qsbR->setValue(2);
+    ui->qsbR->setMinimum(0);
 
-    ui->r1->setValue(1);
-    ui->r1->setMinimum(-1);
+    ui->qsbr1->setValue(1);
+    ui->qsbr1->setMinimum(-1);
 
-    ui->r2->setValue(5);
-    ui->r2->setMinimum(-1);
+    ui->qsbr2->setValue(5);
+    ui->qsbr2->setMinimum(-1);
 
-    ui->bw_t->setValue(10);
-    ui->bw_t->setMinimum(1);
+    ui->qsbBinaryThreshold->setValue(10);
+    ui->qsbBinaryThreshold->setMinimum(1);
 
-    ui->update_date->setEnabled(false);
-    ui->auto_update->setEnabled(false);
-    ui->auto_update->setChecked(false);
+    ui->qpbUpdate->setEnabled(false);
+    ui->qcbAutoUpdate->setEnabled(false);
+    ui->qcbAutoUpdate->setChecked(false);
 }
 
 MainWindow::~MainWindow()
@@ -42,103 +42,113 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_open_file_clicked()
+void MainWindow::on_qpbOpenFile_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open Image"),
-        "",
-        tr("Image File(*.bmp *.jpg *.jpeg *.png)"));
-    std::string name = filename.toStdString();
-    M_input_img = imread(name, IMREAD_GRAYSCALE);
-    if (!M_input_img.data) {
-        ui->update_date->setEnabled(false);
-        ui->auto_update->setEnabled(false);
-        is_img_load = false;
-        ui->show_input_img->clear();
-        ui->show_DFT_img->clear();
-        ui->show_p_DFT_img->clear();
-        ui->show_p_img->clear();
-        ui->show_bw_img->clear();
+                                                    "",
+                                                    tr("Image File(*.bmp *.jpg *.jpeg *.png)"));
+    mInputImg = imread(filename.toStdString(), IMREAD_GRAYSCALE);
+    if (!mInputImg.data) {
+        ui->qpbUpdate->setEnabled(false);
+        ui->qpbUpdate->setEnabled(false);
+        isImgLoad = false;
+        ui->iwInputImg->clear();
+        ui->iwDFTImg->clear();
+        ui->iwProccessedDFTImg->clear();
+        ui->iwProcessedImg->clear();
+        ui->iwInvBinaryImg->clear();
         QMessageBox msgBox;
         msgBox.setText(tr("Image data is null!"));
         msgBox.exec();
     } else {
         int temp;
-        if (M_input_img.cols < M_input_img.rows)
-            temp = M_input_img.cols;
+        if (mInputImg.cols < mInputImg.rows)
+            temp = mInputImg.cols;
         else
-            temp = M_input_img.rows;
+            temp = mInputImg.rows;
         if (temp % 2 == 0)
             temp -= 1;
-        ui->avg_filter_window->setMaximum(temp);
-        ui->update_date->setEnabled(true);
-        ui->auto_update->setEnabled(true);
-        is_img_load = true;
+        ui->qsbAvgFilterSize->setMaximum(temp);
+        ui->qpbUpdate->setEnabled(true);
+        ui->qcbAutoUpdate->setEnabled(true);
+        isImgLoad = true;
         timer.start();
         get_parameters();
-        defect.setParameters(M_input_img, avg_filter_window_size, R_value, r1_value, r2_value, bw_t_value);
+        Mat defectsInfo = defect.setParametersAndProc(mInputImg, avgFilterSize, R, r1, r2, binaryThreshold);
+        update_defects_info(defectsInfo);
         show_images();
-        ui->p_time->setText(QString::number(timer.elapsed()) + " Ms");
+        ui->qlProcTime->setText(QString::number(timer.elapsed()) + " Ms");
     }
 }
 
 void MainWindow::update()
 {
-    if (is_img_load) {
+    if (isImgLoad) {
         timer.start();
         get_parameters();
-        defect.setParameters(avg_filter_window_size, R_value, r1_value, r2_value, bw_t_value);
+        Mat defectsInfo = defect.setParametersAndProc(avgFilterSize, R, r1, r2, binaryThreshold);
+        update_defects_info(defectsInfo);
         show_images();
-        ui->p_time->setText(QString::number(timer.elapsed()) + " Ms");
+        ui->qlProcTime->setText(QString::number(timer.elapsed()) + " Ms");
+    }
+}
+
+void MainWindow::update_defects_info(Mat &defectsInfo)
+{
+    for (int i=1;i<defectsInfo.rows;i++){
+        if (defectsInfo.ptr<int>(i)[4] == 0){
+            continue;
+        }
     }
 }
 
 void MainWindow::show_images()
 {
-    Q_input_img = ConvertMatToQImage(M_input_img);
-    ui->show_input_img->setImage(Q_input_img);
-    Q_DFT_img = ConvertMatToQImage(*defect.getFreqDomainImg());
-    ui->show_DFT_img->setImage(Q_DFT_img);
-    Q_p_DFT_img = ConvertMatToQImage(*defect.getLowPowerImg());
-    ui->show_p_DFT_img->setImage(Q_p_DFT_img);
-    Q_output_img = ConvertMatToQImage(*defect.getBinaryImg());
-    ui->show_p_img->setImage(Q_output_img);
-    Q_bw_img = ConvertMatToQImage(*defect.getInvBinaryImg());
-    ui->show_bw_img->setImage(Q_bw_img);
+    qInputImg = ConvertMatToQImage(mInputImg);
+    ui->iwInputImg->setImage(qInputImg);
+    qDFTImg = ConvertMatToQImage(defect.getFreqDomainImg());
+    ui->iwDFTImg->setImage(qDFTImg);
+    qProcessedDFTImg = ConvertMatToQImage(defect.getLowPowerImg());
+    ui->iwProccessedDFTImg->setImage(qProcessedDFTImg);
+    qProcessedImg = ConvertMatToQImage(defect.getBinaryImg());
+    ui->iwProcessedImg->setImage(qProcessedImg);
+    qInvBinaryImg = ConvertMatToQImage(defect.getInvBinaryImg());
+    ui->iwInvBinaryImg->setImage(qInvBinaryImg);
 }
 
 void MainWindow::get_parameters()
 {
     // 获取均值滤波器窗口大小，R，r1，r2，二值化阈值参数
-    avg_filter_window_size = ui->avg_filter_window->value();
-    if (avg_filter_window_size % 2 == 0) {
-        avg_filter_window_size -= 1;
-        ui->avg_filter_window->setValue(avg_filter_window_size);
+    avgFilterSize = ui->qsbAvgFilterSize->value();
+    if (avgFilterSize % 2 == 0) {
+        avgFilterSize -= 1;
+        ui->qsbAvgFilterSize->setValue(avgFilterSize);
     }
-    R_value = ui->R->value();
-    r1_value = ui->r1->value();
-    r2_value = ui->r2->value();
-    bw_t_value = ui->bw_t->value();
+    R = ui->qsbR->value();
+    r1 = ui->qsbr1->value();
+    r2 = ui->qsbr2->value();
+    binaryThreshold = ui->qsbBinaryThreshold->value();
 }
 
-void MainWindow::on_update_date_clicked()
+void MainWindow::on_qpbUpdate_clicked()
 {
     update();
 }
 
-void MainWindow::on_auto_update_clicked(bool checked)
+void MainWindow::on_qcbAutoUpdate_clicked(bool checked)
 {
     if (checked) {
-        connect(ui->avg_filter_window, SIGNAL(valueChanged(int)), this, SLOT(update()));
-        connect(ui->R, SIGNAL(valueChanged(int)), this, SLOT(update()));
-        connect(ui->r1, SIGNAL(valueChanged(int)), this, SLOT(update()));
-        connect(ui->r2, SIGNAL(valueChanged(int)), this, SLOT(update()));
-        connect(ui->bw_t, SIGNAL(valueChanged(int)), this, SLOT(update()));
+        connect(ui->qsbAvgFilterSize, SIGNAL(valueChanged(int)), this, SLOT(update()));
+        connect(ui->qsbR, SIGNAL(valueChanged(int)), this, SLOT(update()));
+        connect(ui->qsbr1, SIGNAL(valueChanged(int)), this, SLOT(update()));
+        connect(ui->qsbr2, SIGNAL(valueChanged(int)), this, SLOT(update()));
+        connect(ui->qsbBinaryThreshold, SIGNAL(valueChanged(int)), this, SLOT(update()));
         update();
     } else {
-        disconnect(ui->avg_filter_window, SIGNAL(valueChanged(int)), this, SLOT(update()));
-        disconnect(ui->R, SIGNAL(valueChanged(int)), this, SLOT(update()));
-        disconnect(ui->r1, SIGNAL(valueChanged(int)), this, SLOT(update()));
-        disconnect(ui->r2, SIGNAL(valueChanged(int)), this, SLOT(update()));
-        disconnect(ui->bw_t, SIGNAL(valueChanged(int)), this, SLOT(update()));
+        disconnect(ui->qsbAvgFilterSize, SIGNAL(valueChanged(int)), this, SLOT(update()));
+        disconnect(ui->qsbR, SIGNAL(valueChanged(int)), this, SLOT(update()));
+        disconnect(ui->qsbr1, SIGNAL(valueChanged(int)), this, SLOT(update()));
+        disconnect(ui->qsbr2, SIGNAL(valueChanged(int)), this, SLOT(update()));
+        disconnect(ui->qsbBinaryThreshold, SIGNAL(valueChanged(int)), this, SLOT(update()));
     }
 }

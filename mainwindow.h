@@ -23,31 +23,32 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_open_file_clicked();
-    void on_update_date_clicked();
-    void on_auto_update_clicked(bool checked);
+    void on_qpbOpenFile_clicked();
+    void on_qpbUpdate_clicked();
+    void on_qcbAutoUpdate_clicked(bool checked);
     void update();
+    void update_defects_info(Mat& defectsInfo);
     void show_images();
     void get_parameters();
 
 private:
     Ui::MainWindow* ui;
-    Mat M_input_img;
-    QImage Q_input_img;
-    QImage Q_DFT_img;
-    QImage Q_p_DFT_img;
-    QImage Q_output_img;
-    QImage Q_bw_img;
+    Mat mInputImg;
+    QImage qInputImg;
+    QImage qDFTImg;
+    QImage qProcessedDFTImg;
+    QImage qProcessedImg;
+    QImage qInvBinaryImg;
     Detecter defect;
 
-    int avg_filter_window_size;
-    int R_value;
-    int r1_value;
-    int r2_value;
-    int bw_t_value;
+    int avgFilterSize;
+    int R;
+    int r1;
+    int r2;
+    int binaryThreshold;
 
     QElapsedTimer timer;
-    bool is_img_load;
+    bool isImgLoad;
 };
 
 #endif // MAINWINDOW_H
