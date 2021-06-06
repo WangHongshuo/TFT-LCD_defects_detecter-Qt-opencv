@@ -57,15 +57,12 @@ void MainWindow::on_qpbOpenFile_clicked()
         ui->iwProccessedDFTImg->clear();
         ui->iwProcessedImg->clear();
         ui->iwInvBinaryImg->clear();
+        ui->qtwDefectsInfo->setRowCount(0);
         QMessageBox msgBox;
         msgBox.setText(tr("Image data is null!"));
         msgBox.exec();
     } else {
-        int temp;
-        if (mInputImg.cols < mInputImg.rows)
-            temp = mInputImg.cols;
-        else
-            temp = mInputImg.rows;
+        int temp = std::min(mInputImg.cols, mInputImg.rows);
         if (temp % 2 == 0)
             temp -= 1;
         ui->qsbAvgFilterSize->setMaximum(temp);
@@ -73,36 +70,48 @@ void MainWindow::on_qpbOpenFile_clicked()
         ui->qcbAutoUpdate->setEnabled(true);
         isImgLoad = true;
         timer.start();
-        get_parameters();
-        Mat defectsInfo = defect.setParametersAndProc(mInputImg, avgFilterSize, R, r1, r2, binaryThreshold);
-        update_defects_info(defectsInfo);
-        show_images();
+        getParameters();
+        defectsInfo = defect.setParametersAndProc(mInputImg, avgFilterSize, R, r1, r2, binaryThreshold);
+        updateDefectsInfo(defectsInfo);
+        showImages();
         ui->qlProcTime->setText(QString::number(timer.elapsed()) + " Ms");
     }
 }
 
 void MainWindow::update()
 {
-    if (isImgLoad) {
-        timer.start();
-        get_parameters();
-        Mat defectsInfo = defect.setParametersAndProc(avgFilterSize, R, r1, r2, binaryThreshold);
-        update_defects_info(defectsInfo);
-        show_images();
-        ui->qlProcTime->setText(QString::number(timer.elapsed()) + " Ms");
+    if (!isImgLoad) {
+        return;
     }
+    getParameters();
+    timer.start();
+    defectsInfo = defect.setParametersAndProc(avgFilterSize, R, r1, r2, binaryThreshold);
+    ui->qlProcTime->setText(QString::number(timer.elapsed()) + " Ms");
+    showImages();
+    updateDefectsInfo(defectsInfo);
 }
 
-void MainWindow::update_defects_info(Mat &defectsInfo)
+void MainWindow::updateDefectsInfo(Mat &defectsInfo)
 {
+    defectIndex.clear();
+    ui->qtwDefectsInfo->setRowCount(0);
+    int row = 0;
     for (int i=1;i<defectsInfo.rows;i++){
         if (defectsInfo.ptr<int>(i)[4] == 0){
             continue;
         }
+        ui->qtwDefectsInfo->insertRow(ui->qtwDefectsInfo->rowCount());
+        ui->qtwDefectsInfo->setItem(row, 0, new QTableWidgetItem("unkown type"));
+        ui->qtwDefectsInfo->setItem(row, 1, new QTableWidgetItem(QString("%1").arg(defectsInfo.ptr<int>(i)[4])));
+        ui->qtwDefectsInfo->setItem(row, 2,
+            new QTableWidgetItem(QString("x:%1, y:%2, w:%3, h:%4").arg(defectsInfo.ptr<int>(i)[0]).arg(defectsInfo.ptr<int>(i)[1])
+                                     .arg(defectsInfo.ptr<int>(i)[2]).arg(defectsInfo.ptr<int>(i)[3])));
+        defectIndex.push_back(i);
+        row++;
     }
 }
 
-void MainWindow::show_images()
+void MainWindow::showImages()
 {
     qInputImg = ConvertMatToQImage(mInputImg);
     ui->iwInputImg->setImage(qInputImg);
@@ -116,7 +125,7 @@ void MainWindow::show_images()
     ui->iwInvBinaryImg->setImage(qInvBinaryImg);
 }
 
-void MainWindow::get_parameters()
+void MainWindow::getParameters()
 {
     // 获取均值滤波器窗口大小，R，r1，r2，二值化阈值参数
     avgFilterSize = ui->qsbAvgFilterSize->value();
@@ -152,3 +161,11 @@ void MainWindow::on_qcbAutoUpdate_clicked(bool checked)
         disconnect(ui->qsbBinaryThreshold, SIGNAL(valueChanged(int)), this, SLOT(update()));
     }
 }
+
+void MainWindow::on_qtwDefectsInfo_cellClicked(int row, int column)
+{
+    ui->iwInvBinaryImg->removeAllROI();
+    int i = defectIndex[row];
+    ui->iwInvBinaryImg->addROI(QRect(defectsInfo.ptr<int>(i)[0], defectsInfo.ptr<int>(i)[1],defectsInfo.ptr<int>(i)[2],defectsInfo.ptr<int>(i)[3]), i);
+}
+

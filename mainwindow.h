@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QTime>
 #include <QElapsedTimer>
+#include <QTableWidgetItem>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 
@@ -27,9 +28,11 @@ private slots:
     void on_qpbUpdate_clicked();
     void on_qcbAutoUpdate_clicked(bool checked);
     void update();
-    void update_defects_info(Mat& defectsInfo);
-    void show_images();
-    void get_parameters();
+    void updateDefectsInfo(Mat& defectsInfo);
+    void showImages();
+    void getParameters();
+
+    void on_qtwDefectsInfo_cellClicked(int row, int column);
 
 private:
     Ui::MainWindow* ui;
@@ -40,6 +43,9 @@ private:
     QImage qProcessedImg;
     QImage qInvBinaryImg;
     Detecter defect;
+
+    Mat defectsInfo;
+    std::vector<int> defectIndex;
 
     int avgFilterSize;
     int R;
