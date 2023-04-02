@@ -75,6 +75,9 @@ void MainWindow::on_qpbOpenFile_clicked()
         updateDefectsInfo(defectsInfo);
         showImages();
         ui->qlProcTime->setText(QString::number(timer.elapsed()) + " Ms");
+        if (binaryTestWnd) {
+            binaryTestWnd->setImg(mInputImg);
+        }
     }
 }
 
@@ -167,5 +170,24 @@ void MainWindow::on_qtwDefectsInfo_cellClicked(int row, int column)
     ui->iwInvBinaryImg->removeAllROI();
     int i = defectIndex[row];
     ui->iwInvBinaryImg->addROI(QRect(defectsInfo.ptr<int>(i)[0], defectsInfo.ptr<int>(i)[1],defectsInfo.ptr<int>(i)[2],defectsInfo.ptr<int>(i)[3]), i);
+}
+
+
+void MainWindow::on_qpbBinaryTest_clicked()
+{
+    ui->qpbBinaryTest->setEnabled(false);
+    binaryTestWnd = new BinaryTest();
+    binaryTestWnd->setParent(this,Qt::Window);
+    binaryTestWnd->show();
+    connect(binaryTestWnd, SIGNAL(sendWindowsCloseEvent()), this, SLOT(recvBinaryTestWndClose()));
+    binaryTestWnd->setImg(mInputImg);
+}
+
+void MainWindow::recvBinaryTestWndClose()
+{
+    disconnect(binaryTestWnd, SIGNAL(sendWindowsCloseEvent()), this, SLOT(recvBinaryTestWndClose()));
+    delete(binaryTestWnd);
+    binaryTestWnd = nullptr;
+    ui->qpbBinaryTest->setEnabled(true);
 }
 

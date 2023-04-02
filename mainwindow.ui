@@ -372,16 +372,23 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
-            <widget class="QPushButton" name="qpbUpdate">
-             <property name="minimumSize">
-              <size>
-               <width>116</width>
-               <height>23</height>
-              </size>
-             </property>
+            <widget class="QPushButton" name="qpbBinaryTest">
              <property name="maximumSize">
               <size>
-               <width>232</width>
+               <width>234</width>
+               <height>46</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>二值化对照</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="qpbUpdate">
+             <property name="maximumSize">
+              <size>
+               <width>234</width>
                <height>46</height>
               </size>
              </property>
@@ -392,12 +399,6 @@
            </item>
            <item>
             <widget class="QPushButton" name="qpbOpenFile">
-             <property name="minimumSize">
-              <size>
-               <width>117</width>
-               <height>23</height>
-              </size>
-             </property>
              <property name="maximumSize">
               <size>
                <width>234</width>
@@ -474,12 +475,6 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="minimumSize">
-            <size>
-             <width>240</width>
-             <height>30</height>
-            </size>
-           </property>
            <property name="maximumSize">
             <size>
              <width>500</width>
@@ -537,8 +532,8 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>1000</width>
-          <height>1000</height>
+          <width>9999</width>
+          <height>9999</height>
          </size>
         </property>
         <property name="sizeIncrement">
@@ -599,8 +594,8 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>1000</width>
-          <height>1000</height>
+          <width>9999</width>
+          <height>9999</height>
          </size>
         </property>
         <property name="sizeIncrement">
@@ -661,8 +656,8 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>1000</width>
-          <height>1000</height>
+          <width>9999</width>
+          <height>9999</height>
          </size>
         </property>
         <property name="sizeIncrement">
@@ -723,8 +718,8 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>1000</width>
-          <height>1000</height>
+          <width>9999</width>
+          <height>9999</height>
          </size>
         </property>
         <property name="sizeIncrement">
@@ -761,7 +756,6 @@
         <property name="font">
          <font>
           <pointsize>11</pointsize>
-          <weight>50</weight>
           <bold>false</bold>
          </font>
         </property>
@@ -790,8 +784,8 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>1000</width>
-          <height>1000</height>
+          <width>9999</width>
+          <height>9999</height>
          </size>
         </property>
         <property name="sizeIncrement">

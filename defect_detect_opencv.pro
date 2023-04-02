@@ -24,6 +24,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    binarytest.cpp \
         main.cpp \
         mainwindow.cpp \
     detecter.cpp \
@@ -31,12 +32,14 @@ SOURCES += \
     QImageMatConvert/mat_qimage_convert.cpp
 
 HEADERS += \
+    binarytest.h \
         mainwindow.h \
     detecter.h \
     ImageWidget-Qt/ImageWidget.h \
     QImageMatConvert/mat_qimage_convert.h
 
 FORMS += \
+        binarytest.ui \
         mainwindow.ui
 
 # MinGW32

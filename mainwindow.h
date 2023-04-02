@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "detecter.h"
+#include "binarytest.h"
 #include <QImage>
 #include <QMainWindow>
 #include <QTime>
@@ -31,11 +32,14 @@ private slots:
     void updateDefectsInfo(Mat& defectsInfo);
     void showImages();
     void getParameters();
-
     void on_qtwDefectsInfo_cellClicked(int row, int column);
+    void on_qpbBinaryTest_clicked();
+    void recvBinaryTestWndClose();
+
 
 private:
     Ui::MainWindow* ui;
+    BinaryTest* binaryTestWnd;
     Mat mInputImg;
     QImage qInputImg;
     QImage qDFTImg;
